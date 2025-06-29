@@ -6,6 +6,8 @@ import App from './App.jsx'
 import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import Navbar from './components/Navbar.jsx'
+import MyBooks from './pages/MyBooks.jsx'
+
 
 const RootLayout = ({ children }) => (
   <div>
@@ -22,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/" element={<App />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/my-books" element={<MyBooks />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>
