@@ -1,8 +1,12 @@
 from flask import Blueprint, jsonify, request
-from models import db, Book
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from models import db, Book, User
 
 api = Blueprint('api', __name__)
 
+# ---------------------
+# 📚 GET ALL BOOKS
+# ---------------------
 @api.route('/books', methods=['GET'])
 def get_books():
     books = Book.query.all()
@@ -20,25 +24,29 @@ def get_books():
     return jsonify(book_list), 200
 
 
+# ---------------------
+# 🔐 CREATE A BOOK (Protected)
+# ---------------------
 @api.route('/books', methods=['POST'])
+@jwt_required()
 def create_book():
+    user_id = get_jwt_identity()  # Get ID from token
     data = request.get_json()
 
     title = data.get('title')
     author = data.get('author')
     genre = data.get('genre')
     condition = data.get('condition')
-    owner_id = data.get('owner_id')  # will be replaced with JWT user ID later
 
-    if not all([title, author, owner_id]):
-        return {'error': 'Title, author, and owner_id are required.'}, 400
+    if not all([title, author]):
+        return {'error': 'Title and author are required.'}, 400
 
     new_book = Book(
         title=title,
         author=author,
         genre=genre,
         condition=condition,
-        owner_id=owner_id
+        owner_id=user_id
     )
 
     db.session.add(new_book)
@@ -52,4 +60,54 @@ def create_book():
         'condition': new_book.condition,
         'owner_id': new_book.owner_id
     }, 201
+
+
+# ---------------------
+# 📝 SIGNUP (No Auth Required)
+# ---------------------
+@api.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    location = data.get('location')
+
+    if not all([username, email, password]):
+        return {'error': 'Username, email, and password are required.'}, 400
+
+    if User.query.filter((User.username == username) | (User.email == email)).first():
+        return {'error': 'Username or email already exists.'}, 409
+
+    new_user = User(username=username, email=email, location=location)
+    new_user.password = password  # hashed via setter
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    token = create_access_token(identity=new_user.id)
+    return {'token': token, 'user_id': new_user.id}, 201
+
+
+# ---------------------
+# 🔑 LOGIN
+# ---------------------
+@api.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return {'error': 'Username and password required.'}, 400
+
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.verify_password(password):
+        token = create_access_token(identity=user.id)
+        return {'token': token, 'user_id': user.id}, 200
+    else:
+        return {'error': 'Invalid credentials.'}, 401
 
