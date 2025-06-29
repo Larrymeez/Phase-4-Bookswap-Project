@@ -2,19 +2,17 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
-import BooksPage from './pages/BooksPage.jsx'
-import ClubsPage from './pages/ClubsPage.jsx'
-import ProfilePage from './pages/ProfilePage.jsx'
+import Signup from './pages/Signup.jsx'
+import Login from './pages/Login.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/books" element={<BooksPage />} />
-        <Route path="/clubs" element={<ClubsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
