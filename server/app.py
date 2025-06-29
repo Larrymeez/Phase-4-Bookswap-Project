@@ -16,8 +16,8 @@ def create_app():
     CORS(app)
 
     # Register blueprints (routes will go here later)
-    # from routes import api
-    # app.register_blueprint(api)
+    from routes import api
+    app.register_blueprint(api)
 
     @app.route('/')
     def home():
