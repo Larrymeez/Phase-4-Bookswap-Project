@@ -24,9 +24,6 @@ def get_books():
     return jsonify(book_list), 200
 
 
-# ---------------------
-# 🔐 CREATE A BOOK (Protected)
-# ---------------------
 @api.route('/books', methods=['POST'])
 @jwt_required()
 def create_book():
@@ -62,9 +59,6 @@ def create_book():
     }, 201
 
 
-# ---------------------
-# 📝 SIGNUP (No Auth Required)
-# ---------------------
 @api.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -90,9 +84,7 @@ def signup():
     return {'token': token, 'user_id': new_user.id}, 201
 
 
-# ---------------------
-# 🔑 LOGIN
-# ---------------------
+
 @api.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -110,4 +102,19 @@ def login():
         return {'token': token, 'user_id': user.id}, 200
     else:
         return {'error': 'Invalid credentials.'}, 401
+
+@api.route('/my-books', methods=['GET'])
+@jwt_required()
+def my_books():
+    user_id = get_jwt_identity()
+    books = Book.query.filter_by(owner_id=user_id).all()
+    return jsonify([
+        {
+            'id': b.id,
+            'title': b.title,
+            'author': b.author,
+            'genre': b.genre,
+            'condition': b.condition
+        } for b in books
+    ])        
 
