@@ -1,8 +1,35 @@
 import React, { useState } from 'react'
+import { authorizedFetch } from '../utils/api'
+
 
 const SearchBooks = () => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
+
+  const handleSave = async (book) => {
+    const payload = {
+      title: book.title,
+      author: book.author_name?.[0] || "Unknown",
+      genre: "Unknown",
+      condition: "Good"
+    }
+  
+    try {
+      const res = await authorizedFetch('http://127.0.0.1:5000/books', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+  
+      if (res.error) {
+        alert("❌ Failed to save book: " + res.error)
+      } else {
+        alert("✅ Book saved successfully!")
+      }
+    } catch (err) {
+      console.error("Error saving book:", err)
+      alert("❌ Could not save book.")
+    }
+  }
 
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -29,17 +56,26 @@ const SearchBooks = () => {
 
       {results.length > 0 && (
         <ul className="space-y-4">
-          {results.map((book, i) => (
-            <li key={i} className="border p-4 rounded shadow">
-              <h3 className="font-semibold">{book.title}</h3>
-              <p>Author: {book.author_name?.join(', ')}</p>
-              <p>First Published: {book.first_publish_year}</p>
-            </li>
-          ))}
-        </ul>
+        {results.map((book, index) => (
+          <li key={index} className="border p-4 rounded shadow">
+            <h3 className="font-semibold">{book.title}</h3>
+            <p>Author: {book.author_name?.[0]}</p>
+            <p>First published: {book.first_publish_year}</p>
+            <button
+              onClick={() => handleSave(book)}
+              className="mt-2 bg-green-500 text-white px-3 py-1 rounded"
+            >
+              Save to My Books
+            </button>
+          </li>
+        ))}
+      </ul>
+      
       )}
     </div>
   )
 }
 
+
+  
 export default SearchBooks
