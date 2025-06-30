@@ -11,30 +11,19 @@ const Navbar = () => {
         <li><Link to="/">Home</Link></li>
 
         {user ? (
-  <>
-    <li><Link to="/my-books">My Books</Link></li>
-    <li><Link to="/add-book">Add Book</Link></li>
+          <>
+            <li><Link to="/my-books">My Books</Link></li>
+            <li><Link to="/add-book">Add Book</Link></li>
 
-    {user.is_admin && (
-      <li><Link to="/admin">Admin Dashboard</Link></li>
-    )}
-
-    <li>
-      <button onClick={logout} className="bg-red-500 text-white px-3 py-1 rounded">
-        Logout
-      </button>
-    </li>
-  </>
-) : (
-  <>
-    <li><Link to="/signup">Sign Up</Link></li>
-    <li><Link to="/login">Log In</Link></li>
-  </>
-)}
-
+            {user.is_admin && (
+              <li><Link to="/admin">Admin Dashboard</Link></li>
+            )}
 
             <li>
-              <button onClick={logout} className="bg-red-500 text-white px-3 py-1 rounded">
+              <button
+                onClick={logout}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
                 Logout
               </button>
             </li>
@@ -51,5 +40,4 @@ const Navbar = () => {
 }
 
 export default Navbar
-
 
