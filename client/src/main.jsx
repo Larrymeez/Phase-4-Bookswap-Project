@@ -9,6 +9,8 @@ import Navbar from './components/Navbar.jsx'
 import MyBooks from './pages/MyBooks.jsx'
 import { AuthProvider } from './context/AuthContext'
 import AddBook from './pages/AddBook.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+
 
 const RootLayout = ({ children }) => (
   <div>
@@ -27,6 +29,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/login" element={<Login />} />
             <Route path="/my-books" element={<MyBooks />} />
             <Route path="/add-book" element={<AddBook />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+
           </Routes>
         </RootLayout>
       </AuthProvider>
