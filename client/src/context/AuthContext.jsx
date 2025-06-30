@@ -7,19 +7,29 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
+  // Restore user from localStorage
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) setUser({ token }) // simple version: treat presence of token as logged in
+    const is_admin = JSON.parse(localStorage.getItem('is_admin'))
+  
+    if (token) {
+      setUser({ token, is_admin })
+    }
   }, [])
+  
 
-  const login = (token) => {
+  // Save token + user on login
+  const login = (token, is_admin) => {
     localStorage.setItem('token', token)
-    setUser({ token })
-    navigate('/my-books')
+    localStorage.setItem('is_admin', JSON.stringify(is_admin)) // store admin flag
+    setUser({ token, is_admin })
+    navigate(is_admin ? '/admin' : '/my-books')  // Redirect to admin dashboard
   }
+  
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setUser(null)
     navigate('/login')
   }
@@ -30,3 +40,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+

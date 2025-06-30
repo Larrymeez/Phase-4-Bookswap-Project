@@ -11,16 +11,18 @@ const Login = () => {
       const res = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify(values),
       })
 
       const data = await res.json()
       if (res.ok) {
-        login(data.token)  // ✅ use context method to log in + redirect
+        login(data.token, data.is_admin)  
+        alert('Login successful!')
       } else {
         alert(data.error || 'Login failed')
       }
     } catch (err) {
+      console.error(err)
       alert('Error logging in')
     } finally {
       setSubmitting(false)
