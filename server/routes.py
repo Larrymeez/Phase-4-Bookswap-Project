@@ -1,12 +1,13 @@
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
-from models import db, Book, User
+from flask import request, jsonify
+from flask_jwt_extended import create_access_token
+from models import db, User
+from werkzeug.security import check_password_hash
+import traceback
 
 api = Blueprint('api', __name__)
 
 # ---------------------
-# 📚 GET ALL BOOKS
-# ---------------------
+
 @api.route('/books', methods=['GET'])
 def get_books():
     books = Book.query.all()
@@ -84,24 +85,32 @@ def signup():
     return {'token': token, 'user_id': new_user.id}, 201
 
 
-
 @api.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+        username = data.get("username")
+        password = data.get("password")
 
-    username = data.get('username')
-    password = data.get('password')
+        if not username or not password:
+            return {"error": "Username and password required."}, 400
 
-    if not username or not password:
-        return {'error': 'Username and password required.'}, 400
+        user = User.query.filter_by(username=username).first()
 
-    user = User.query.filter_by(username=username).first()
+        if not user or not check_password_hash(user.password_hash, password):
+            return {"error": "Invalid credentials."}, 401
 
-    if user and user.verify_password(password):
-        token = create_access_token(identity=user.id)
-        return {'token': token, 'user_id': user.id}, 200
-    else:
-        return {'error': 'Invalid credentials.'}, 401
+        access_token = create_access_token(identity=user.id)
+        return jsonify(token=access_token), 200
+
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e)}, 500
+
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e)}, 500
+
 
 @api.route('/my-books', methods=['GET'])
 @jwt_required()
@@ -136,4 +145,46 @@ def get_my_books():
     ]
 
     return jsonify(book_list), 200
+
+@api.route('/books/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_book(id):
+    user_id = get_jwt_identity()
+    book = Book.query.get(id)
+
+    if not book:
+        return {'error': 'Book not found'}, 404
+
+    if book.owner_id != user_id:
+        return {'error': 'Unauthorized'}, 403
+
+    db.session.delete(book)
+    db.session.commit()
+    return {'message': 'Book deleted'}, 200
+    
+@api.route('/admin/books', methods=['GET'])
+@jwt_required()
+def get_all_books():
+    user_id = get_jwt_identity()
+
+    # Simple check — assume user with ID 1 is admin
+    if user_id != 1:
+        return {'error': 'Unauthorized'}, 403
+
+    books = Book.query.all()
+    book_list = [
+        {
+            'id': book.id,
+            'title': book.title,
+            'author': book.author,
+            'genre': book.genre,
+            'condition': book.condition,
+            'owner_id': book.owner_id
+        }
+        for book in books
+    ]
+
+    return jsonify(book_list), 200
+
+
 

@@ -5,21 +5,18 @@ from flask_jwt_extended import JWTManager
 
 from models import db
 
-# Initialize JWTManager
-jwt = JWTManager()
-
 def create_app():
     app = Flask(__name__)
 
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bookswap.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # 🔐 Replace with a strong secret in production
+    app.config['JWT_SECRET_KEY'] = 'super-secret'  # Replace in production
 
     # Initialize extensions
     db.init_app(app)
-    jwt.init_app(app)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    JWTManager(app)
 
     # Register blueprints
     from routes import api
@@ -30,3 +27,5 @@ def create_app():
         return {'message': 'Welcome to BookSwap API 🎉'}
 
     return app
+
+
