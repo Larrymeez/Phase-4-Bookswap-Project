@@ -38,10 +38,16 @@ def get_clubs():
     ])
 
 # Join a club
-@club_api.route('/clubs/<int:club_id>/join', methods=['POST'])
-@jwt_required()
+@club_api.route('/clubs/<int:club_id>/join', methods=['POST', 'OPTIONS'])
+@jwt_required(optional=True)  # Optional so OPTIONS doesn't require auth
 def join_club(club_id):
+    if request.method == 'OPTIONS':
+        return '', 200  # Respond to preflight with OK and CORS headers
+
     user_id = get_jwt_identity()
+    if not user_id:
+        return {'error': 'Unauthorized'}, 401
+
     existing = Membership.query.filter_by(user_id=user_id, club_id=club_id).first()
     if existing:
         return {'message': 'Already a member.'}, 200
@@ -51,11 +57,17 @@ def join_club(club_id):
     db.session.commit()
     return {'message': 'Joined club successfully.'}, 201
 
-# Leave a club
-@club_api.route('/clubs/<int:club_id>/leave', methods=['DELETE'])
-@jwt_required()
+
+@club_api.route('/clubs/<int:club_id>/leave', methods=['DELETE', 'OPTIONS'])
+@jwt_required(optional=True)
 def leave_club(club_id):
+    if request.method == 'OPTIONS':
+        return '', 200  # Respond to preflight with OK and CORS headers
+
     user_id = get_jwt_identity()
+    if not user_id:
+        return {'error': 'Unauthorized'}, 401
+
     membership = Membership.query.filter_by(user_id=user_id, club_id=club_id).first()
     if not membership:
         return {'error': 'You are not a member of this club.'}, 404
@@ -63,6 +75,7 @@ def leave_club(club_id):
     db.session.delete(membership)
     db.session.commit()
     return {'message': 'Left club successfully.'}, 200
+
 
 # Get club members
 @club_api.route('/clubs/<int:club_id>/members', methods=['GET'])
@@ -96,3 +109,26 @@ def seed_clubs():
             db.session.commit()
 
     return jsonify({'message': '✅ Sample book clubs added!'}), 201
+
+# Get all clubs the current user has joined
+@club_api.route('/my-clubs', methods=['GET'])
+@jwt_required()
+def my_clubs():
+    user_id = get_jwt_identity()
+    memberships = Membership.query.filter_by(user_id=user_id).all()
+    clubs = [BookClub.query.get(m.club_id) for m in memberships]
+    return jsonify([
+        {'id': c.id, 'name': c.name, 'description': c.description}
+        for c in clubs if c
+    ])
+
+@club_api.route('/my-clubs', methods=['GET'])
+@jwt_required()
+def get_my_clubs():
+    user_id = get_jwt_identity()
+    memberships = Membership.query.filter_by(user_id=user_id).all()
+    clubs = [BookClub.query.get(m.club_id) for m in memberships]
+    return jsonify([
+        {'id': club.id, 'name': club.name, 'description': club.description}
+        for club in clubs if club
+    ])

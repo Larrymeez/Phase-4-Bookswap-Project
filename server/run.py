@@ -1,9 +1,8 @@
 from app import create_app
-from models import db
 
 app = create_app()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Creates tables from models
-    app.run(debug=True, port=5000)  # ✅ Explicitly specify port
+    app.run(debug=True)
+
+

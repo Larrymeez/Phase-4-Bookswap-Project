@@ -3,16 +3,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
-# Association Table with extra fields
+# Association Table
 class Membership(db.Model):
     __tablename__ = 'memberships'
 
     id = db.Column(db.Integer, primary_key=True)
-    role = db.Column(db.String, nullable=False)
-    joined_on = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    club_id = db.Column(db.Integer, db.ForeignKey('book_clubs.id'), nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    book_club_id = db.Column(db.Integer, db.ForeignKey('book_clubs.id'))
+    user = db.relationship('User', back_populates='memberships')
+    club = db.relationship('BookClub', back_populates='memberships')
+
+    __table_args__ = (db.UniqueConstraint('user_id', 'club_id', name='unique_membership'),)
 
 
 class User(db.Model):
@@ -26,8 +28,8 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     books = db.relationship('Book', backref='owner', lazy=True)
-    memberships = db.relationship('Membership', backref='user', cascade="all, delete")
-    created_clubs = db.relationship('BookClub', backref='creator', lazy=True)
+    memberships = db.relationship('Membership', back_populates='user', cascade="all, delete-orphan")
+    created_clubs = db.relationship('BookClub', back_populates='creator', lazy=True)
 
     @property
     def password(self):
@@ -63,4 +65,5 @@ class BookClub(db.Model):
 
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    memberships = db.relationship('Membership', backref='book_club', cascade="all, delete")
+    creator = db.relationship('User', back_populates='created_clubs')
+    memberships = db.relationship('Membership', back_populates='club', cascade="all, delete-orphan")
