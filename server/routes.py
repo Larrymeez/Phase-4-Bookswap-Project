@@ -118,3 +118,22 @@ def my_books():
         } for b in books
     ])        
 
+@api.route('/my-books', methods=['GET'])
+@jwt_required()
+def get_my_books():
+    user_id = get_jwt_identity()
+    books = Book.query.filter_by(owner_id=user_id).all()
+
+    book_list = [
+        {
+            'id': book.id,
+            'title': book.title,
+            'author': book.author,
+            'genre': book.genre,
+            'condition': book.condition
+        }
+        for book in books
+    ]
+
+    return jsonify(book_list), 200
+
