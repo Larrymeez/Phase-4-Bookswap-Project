@@ -2,8 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from admin_routes import admin_api  
 
-from models import db  # ✅ Only this instance
+
+from models import db  
 from routes import api
 from club_routes import club_api
 
@@ -21,6 +23,8 @@ def create_app():
 
     app.register_blueprint(api)
     app.register_blueprint(club_api)
+    app.register_blueprint(admin_api) 
+
 
     @app.route('/')
     def home():
