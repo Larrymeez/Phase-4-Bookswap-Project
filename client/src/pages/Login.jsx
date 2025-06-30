@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
+import { AuthContext } from '../context/AuthContext'
 
 const Login = () => {
+  const { login } = useContext(AuthContext)
+
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const res = await fetch('http://127.0.0.1:5000/login', {
@@ -13,9 +16,7 @@ const Login = () => {
 
       const data = await res.json()
       if (res.ok) {
-        localStorage.setItem('token', data.token)
-        alert('Login successful!')
-        // redirect logic will go here
+        login(data.token)  // ✅ use context method to log in + redirect
       } else {
         alert(data.error || 'Login failed')
       }
