@@ -10,6 +10,9 @@ import MyBooks from './pages/MyBooks.jsx'
 import { AuthProvider } from './context/AuthContext'
 import AddBook from './pages/AddBook.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
+import SearchBooks from './pages/SearchBooks'
+import UserProfile from './components/UserProfile.jsx'
+import BookClubs from './pages/BookClubs.jsx'
 
 
 const RootLayout = ({ children }) => (
@@ -30,6 +33,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/my-books" element={<MyBooks />} />
             <Route path="/add-book" element={<AddBook />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/search-books" element={<SearchBooks />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/clubs" element={<BookClubs />} />
+            
+
+
 
 
           </Routes>

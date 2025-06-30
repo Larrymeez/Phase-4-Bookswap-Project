@@ -15,10 +15,19 @@ const Navbar = () => {
             <li><Link to="/my-books">My Books</Link></li>
             <li><Link to="/add-book">Add Book</Link></li>
             <li><Link to="/search-books">Search Books</Link></li>
-            <li><Link to="/profile">Profile</Link></li> {/* 👈 New Profile link */}
+            <li><Link to="/profile">Profile</Link></li>
+            <li><Link to="/clubs">Book Clubs</Link></li>
 
+            {/* ✅ Only visible to admins */}
             {user.is_admin && (
-              <li><Link to="/admin">Admin Dashboard</Link></li>
+              <li>
+                <Link
+                  to="/admin"
+                  className="text-blue-600 font-semibold hover:underline"
+                >
+                  Admin Dashboard
+                </Link>
+              </li>
             )}
 
             <li>
