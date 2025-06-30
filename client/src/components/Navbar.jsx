@@ -14,6 +14,8 @@ const Navbar = () => {
           <>
             <li><Link to="/my-books">My Books</Link></li>
             <li><Link to="/add-book">Add Book</Link></li>
+            <li><Link to="/search-books">Search Books</Link></li>
+            <li><Link to="/profile">Profile</Link></li> {/* 👈 New Profile link */}
 
             {user.is_admin && (
               <li><Link to="/admin">Admin Dashboard</Link></li>
