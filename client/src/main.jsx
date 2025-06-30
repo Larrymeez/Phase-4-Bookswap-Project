@@ -8,6 +8,7 @@ import Login from './pages/Login.jsx'
 import Navbar from './components/Navbar.jsx'
 import MyBooks from './pages/MyBooks.jsx'
 import { AuthProvider } from './context/AuthContext'
+import AddBook from './pages/AddBook.jsx'
 
 const RootLayout = ({ children }) => (
   <div>
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/my-books" element={<MyBooks />} />
+            <Route path="/add-book" element={<AddBook />} />
           </Routes>
         </RootLayout>
       </AuthProvider>

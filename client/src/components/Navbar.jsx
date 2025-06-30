@@ -13,6 +13,7 @@ const Navbar = () => {
         {user ? (
           <>
             <li><Link to="/my-books">My Books</Link></li>
+            <li><Link to="/add-book">Add Book</Link></li>
             <li>
               <button onClick={logout} className="bg-red-500 text-white px-3 py-1 rounded">
                 Logout
@@ -31,4 +32,5 @@ const Navbar = () => {
 }
 
 export default Navbar
+
 
