@@ -1,9 +1,10 @@
-from flask import request, jsonify
-from flask_jwt_extended import create_access_token
-from models import db, User
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from werkzeug.security import check_password_hash
+from models import db, Book, User
 import traceback
-
+from club_routes import club_api
+club_api = Blueprint("club_api", __name__)
 api = Blueprint('api', __name__)
 
 # ---------------------
@@ -97,35 +98,16 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if not user or not check_password_hash(user.password_hash, password):
+        if not user or not user.verify_password(password):
             return {"error": "Invalid credentials."}, 401
 
         access_token = create_access_token(identity=user.id)
-        return jsonify(token=access_token), 200
+        return jsonify(token=access_token, is_admin=user.is_admin), 200
 
     except Exception as e:
         traceback.print_exc()
         return {"error": str(e)}, 500
 
-    except Exception as e:
-        traceback.print_exc()
-        return {"error": str(e)}, 500
-
-
-@api.route('/my-books', methods=['GET'])
-@jwt_required()
-def my_books():
-    user_id = get_jwt_identity()
-    books = Book.query.filter_by(owner_id=user_id).all()
-    return jsonify([
-        {
-            'id': b.id,
-            'title': b.title,
-            'author': b.author,
-            'genre': b.genre,
-            'condition': b.condition
-        } for b in books
-    ])        
 
 @api.route('/my-books', methods=['GET'])
 @jwt_required()
@@ -185,6 +167,125 @@ def get_all_books():
     ]
 
     return jsonify(book_list), 200
+
+@api.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    return {
+        'username': user.username,
+        'email': user.email,
+        'location': user.location,
+        'is_admin': user.is_admin,
+        'books': [
+            {
+                'id': b.id,
+                'title': b.title,
+                'author': b.author,
+                'genre': b.genre,
+                'condition': b.condition
+            } for b in user.books
+        ]
+    }, 200
+
+@club_api.route('/clubs', methods=['POST'])
+@jwt_required()
+def create_club():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    name = data.get('name')
+    description = data.get('description')
+
+    if not name:
+        return {'error': 'Club name is required.'}, 400
+
+    new_club = BookClub(name=name, description=description, creator_id=user_id)
+    db.session.add(new_club)
+    db.session.commit()
+
+    # Add creator as first member
+    membership = Membership(user_id=user_id, club_id=new_club.id)
+    db.session.add(membership)
+    db.session.commit()
+
+    return jsonify({'id': new_club.id, 'name': new_club.name, 'description': new_club.description}), 201
+
+# Get all clubs
+@club_api.route('/clubs', methods=['GET'])
+@jwt_required()
+def get_clubs():
+    clubs = BookClub.query.all()
+    return jsonify([
+        {'id': club.id, 'name': club.name, 'description': club.description}
+        for club in clubs
+    ])
+
+# Join a club
+@club_api.route('/clubs/<int:club_id>/join', methods=['POST'])
+@jwt_required()
+def join_club(club_id):
+    user_id = get_jwt_identity()
+    existing = Membership.query.filter_by(user_id=user_id, club_id=club_id).first()
+    if existing:
+        return {'message': 'Already a member.'}, 200
+
+    membership = Membership(user_id=user_id, club_id=club_id)
+    db.session.add(membership)
+    db.session.commit()
+    return {'message': 'Joined club successfully.'}, 201
+
+# Leave a club
+@club_api.route('/clubs/<int:club_id>/leave', methods=['DELETE'])
+@jwt_required()
+def leave_club(club_id):
+    user_id = get_jwt_identity()
+    membership = Membership.query.filter_by(user_id=user_id, club_id=club_id).first()
+    if not membership:
+        return {'error': 'You are not a member of this club.'}, 404
+
+    db.session.delete(membership)
+    db.session.commit()
+    return {'message': 'Left club successfully.'}, 200
+
+# Get club members
+@club_api.route('/clubs/<int:club_id>/members', methods=['GET'])
+@jwt_required()
+def get_members(club_id):
+    members = Membership.query.filter_by(club_id=club_id).all()
+    users = [User.query.get(m.user_id) for m in members]
+    return jsonify([
+        {'id': u.id, 'username': u.username, 'email': u.email}
+        for u in users if u
+    ])
+
+    # Get single club details
+@club_api.route('/clubs/<int:club_id>', methods=['GET'])
+@jwt_required()
+def get_club_details(club_id):
+    club = BookClub.query.get_or_404(club_id)
+    creator = User.query.get(club.creator_id)
+
+    members = Membership.query.filter_by(club_id=club_id).all()
+    member_count = len(members)
+
+    return jsonify({
+        'id': club.id,
+        'name': club.name,
+        'description': club.description,
+        'creator': {
+            'id': creator.id,
+            'username': creator.username,
+            'email': creator.email
+        },
+        'member_count': member_count
+    }), 200
+
+
 
 
 
