@@ -33,23 +33,40 @@ const MyBooks = () => {
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl mb-4">My Books</h2>
+    <div
+      className="p-8 max-w-4xl mx-auto"
+      style={{
+        fontFamily: "'Georgia', serif",
+        background: 'linear-gradient(to bottom right, #fef9f4, #f3e6d3)',
+        minHeight: '100vh'
+      }}
+    >
+      <h2
+        className="text-3xl mb-6 text-center font-bold"
+        style={{ color: '#8B0000' }}
+      >
+        📚 My Book Collection
+      </h2>
+
       {books.length === 0 ? (
-        <p>You have no books yet.</p>
+        <p className="text-center text-gray-600">You haven’t added any books yet.</p>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-5">
           {books.map(book => (
-            <li key={book.id} className="border p-4 rounded shadow">
-              <h3 className="font-semibold">{book.title}</h3>
-              <p>Author: {book.author}</p>
-              <p>Genre: {book.genre}</p>
-              <p>Condition: {book.condition}</p>
+            <li
+              key={book.id}
+              className="bg-white border-l-4 border-amber-700 p-5 rounded-lg shadow-md"
+              style={{ backgroundColor: '#fffaf0' }}
+            >
+              <h3 className="text-xl font-semibold text-brown-900">{book.title}</h3>
+              <p className="text-sm text-gray-700">✍️ Author: <span className="text-zinc-800">{book.author}</span></p>
+              <p className="text-sm text-gray-700">📖 Genre: <span className="text-zinc-800">{book.genre}</span></p>
+              <p className="text-sm text-gray-700">📦 Condition: <span className="text-zinc-800">{book.condition}</span></p>
+
               <button
-                onClick={() => handleDelete(book.id)}
-                className="mt-2 text-red-500 hover:underline"
-              >
-                Delete
+               onClick={() => handleDelete(book.id)}
+               className="mt-3 inline-block text-sm bg-amber-600 hover:bg-amber-700 text-black px-4 py-2 rounded-xl transition">
+                  🗑️ Delete Book
               </button>
             </li>
           ))}
@@ -60,4 +77,3 @@ const MyBooks = () => {
 }
 
 export default MyBooks
-

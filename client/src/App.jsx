@@ -1,19 +1,28 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import './index.css';
+
 
 function App() {
   return (
-    <div className="min-h-screen bg-amber-50 text-gray-800 font-sans">
-      <header className="bg-amber-200 shadow p-4">
-        <h1 className="text-3xl font-bold text-amber-900">📚 BookSwap</h1>
-        <nav className="mt-2 flex gap-4 text-lg">
-          <Link to="/my-books" className="hover:text-amber-600">My Books</Link>
-          <Link to="/clubs" className="hover:text-amber-600">Book Clubs</Link>
-          <Link to="/profile" className="hover:text-amber-600">Profile</Link>
+    <div className="min-h-screen bg-zinc-50 text-zinc-800 dark:bg-zinc-900 dark:text-white font-sans">
+      <header className="bg-indigo-700 text-white px-6 py-4 shadow-md">
+        <h1 className="text-3xl font-bold">📚 BookSwap</h1>
+        <nav className="mt-2 space-x-4">
+          <Link to="/books" className="hover:underline">
+            My Books
+          </Link>
+          <Link to="/clubs" className="hover:underline">
+            Book Clubs
+          </Link>
+          <Link to="/profile" className="hover:underline">
+            Profile
+          </Link>
         </nav>
       </header>
 
+
       <main className="p-6">
-        <Outlet />
+        {/* Your routes will render here */}
       </main>
     </div>
   )

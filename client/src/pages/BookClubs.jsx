@@ -21,7 +21,7 @@ const BookClubs = () => {
         }
       } catch (err) {
         console.error("Fetch error:", err)
-        setError("Failed to load book clubs.")
+        setError("❌ Failed to load book clubs.")
       }
     }
 
@@ -55,31 +55,35 @@ const BookClubs = () => {
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">📚 Book Clubs</h2>
-      {error && <p className="text-red-500">{error}</p>}
+    <div className="p-6 max-w-4xl mx-auto">
+      <h2 className="text-3xl font-bold text-amber-700 mb-6 tracking-wide">📚 Book Clubs</h2>
+      {error && <p className="text-rose-600 mb-4">{error}</p>}
 
       {clubs.length === 0 ? (
-        <p>No clubs available.</p>
+        <p className="text-zinc-600 italic">No clubs available.</p>
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid md:grid-cols-2 gap-6">
           {clubs.map((club) => {
             const isMember = myClubIds.includes(club.id)
             return (
-              <li key={club.id} className="p-4 border rounded shadow">
-                <h3 className="text-lg font-semibold">{club.name}</h3>
-                <p>{club.description}</p>
+              <li
+                key={club.id}
+                className="border border-amber-200 bg-amber-50 p-5 rounded-xl shadow-sm transition hover:shadow-md"
+              >
+                <h3 className="text-xl font-semibold text-amber-800">{club.name}</h3>
+                <p className="text-zinc-700 mt-1">{club.description}</p>
                 <button
                   onClick={() =>
                     isMember ? handleLeave(club.id) : handleJoin(club.id)
                   }
-                  className={`mt-2 px-3 py-1 rounded ${
-                    isMember
-                      ? 'bg-red-500 text-white hover:bg-red-600'
-                      : 'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
+                  className={`mt-4 px-4 py-2 rounded-lg font-medium transition 
+                    ${
+                      isMember
+                        ? 'bg-rose-600 hover:bg-rose-700 text-black'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-black'
+                    }`}
                 >
-                  {isMember ? "Leave Club" : "Join Club"}
+                  {isMember ? 'Leave Club' : 'Join Club'}
                 </button>
               </li>
             )
@@ -91,3 +95,4 @@ const BookClubs = () => {
 }
 
 export default BookClubs
+

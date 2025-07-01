@@ -1,12 +1,60 @@
-# React + Vite
+# 📚 Bookswap
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bookswap is a full-stack web application for book enthusiasts to share, swap, and manage their book collections. Built with a Flask API backend and a Vite + React + Tailwind CSS frontend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Project Stack
 
-## Expanding the ESLint configuration
+- **Frontend**: React + Vite + Tailwind CSS
+- **Backend**: Flask + SQLAlchemy + Marshmallow
+- **Database**: SQLite (for development)
+- **Authentication**: Token-based (JWT or similar)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🧱 Models Overview
+
+### User
+- `id`: Integer (Primary Key)
+- `username`: String (Unique)
+- `email`: String (Unique)
+- `password_hash`: String  
+- Relationships:  
+  - One-to-many with `Book`
+  - Many-to-many with `SwapRequest` via association table
+
+### Book
+- `id`: Integer (Primary Key)
+- `title`: String
+- `author`: String
+- `genre`: String
+- `owner_id`: ForeignKey → User  
+- Relationships:  
+  - Belongs to one User (owner)
+  - One-to-many with `SwapRequest` (as requested/swapped book)
+
+### SwapRequest
+- `id`: Integer (Primary Key)
+- `book_id`: ForeignKey → Book
+- `requester_id`: ForeignKey → User
+- `status`: String (`pending`, `accepted`, `declined`)
+- `message`: Optional user-submittable message  
+- Relationships:
+  - Many-to-many link between Users and Books
+
+---
+
+## 🛠 Setup Instructions
+
+### Backend
+
+```bash
+cd server
+pipenv install
+pipenv shell
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+python seed.py  # Optional: Seed the DB with sample data
+flask run

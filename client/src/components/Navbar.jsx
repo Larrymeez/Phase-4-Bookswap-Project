@@ -6,46 +6,57 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext)
 
   return (
-    <nav className="bg-gray-100 px-6 py-4 mb-4 shadow">
-      <ul className="flex gap-4 items-center">
-        <li><Link to="/">Home</Link></li>
-
-        {user ? (
-          <>
-            <li><Link to="/my-books">My Books</Link></li>
-            <li><Link to="/add-book">Add Book</Link></li>
-            <li><Link to="/search-books">Search Books</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><Link to="/clubs">Book Clubs</Link></li>
-
-            {/* ✅ Only visible to admins */}
-            {user.is_admin && (
-              <li>
-                <Link
-                  to="/admin"
-                  className="text-blue-600 font-semibold hover:underline"
-                >
-                  Admin Dashboard
-                </Link>
-              </li>
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+      <div className="container">
+        <Link className="navbar-brand text-danger fw-bold" to="/">
+          BookSwap
+        </Link>
+        <div className="collapse navbar-collapse">
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+            {user ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/my-books">My Books</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/add-book">Add Book</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/search-books">Search</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/profile">Profile</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/clubs">Clubs</Link>
+                </li>
+                {user.is_admin && (
+                  <li className="nav-item">
+                    <Link className="nav-link text-primary fw-semibold" to="/admin">Admin</Link>
+                  </li>
+                )}
+                <li className="nav-item">
+                  <button
+                    onClick={logout}
+                    className="btn btn-danger ms-2"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="btn btn-primary me-2" to="/signup">Sign Up</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="btn btn-outline-primary" to="/login">Log In</Link>
+                </li>
+              </>
             )}
-
-            <li>
-              <button
-                onClick={logout}
-                className="bg-red-500 text-white px-3 py-1 rounded"
-              >
-                Logout
-              </button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li><Link to="/signup">Sign Up</Link></li>
-            <li><Link to="/login">Log In</Link></li>
-          </>
-        )}
-      </ul>
+          </ul>
+        </div>
+      </div>
     </nav>
   )
 }
